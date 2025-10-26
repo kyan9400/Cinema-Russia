@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Movies — A–Z</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root{color-scheme:dark light}
+    *{box-sizing:border-box}
+    body{
+      margin:0; padding:32px 28px 80px;
+      background:
+        radial-gradient(1200px 400px at 90% 110%, rgba(56,189,248,.08), transparent 60%),
+        radial-gradient(900px 400px at -10% -10%, rgba(147,51,234,.08), transparent 60%),
+        #0b1020;
+      color:#e6edf3; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    }
+    .container{max-width:1180px;margin:0 auto}
+    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+    .logo{font-weight:800;letter-spacing:.2px;font-size:28px}
+    .sub{color:#8ea0b5;font-size:13px;margin-top:4px}
+
+    .toolbar{display:grid;grid-template-columns:1fr auto auto auto;gap:10px;align-items:center;margin:16px 0 14px}
+    .input{
+      display:flex;align-items:center;gap:8px;
+      background:#0e152a;border:1px solid #273449;border-radius:12px;padding:8px 12px;
+    }
+    .input input{flex:1;background:transparent;border:0;outline:0;color:#e6edf3;font-size:14px}
+    .btn{background:#162036;border:1px solid #334155;color:#e6edf3;border-radius:12px;padding:9px 14px;cursor:pointer;font-weight:600;transition:.15s}
+    .btn:hover{transform:translateY(-1px);background:#1d2946}
+    .btn.secondary{background:transparent}
+    .note{margin:6px 2px 12px;color:#8ea0b5}
+
+    .alpha{
+      position:sticky; top:12px; z-index:20;
+      display:flex; flex-wrap:wrap; gap:6px; padding:10px; margin:8px 0 16px;
+      background:linear-gradient(180deg,rgba(11,16,32,.9),rgba(11,16,32,.7));
+      border:1px solid #1e293b; border-radius:14px; backdrop-filter: blur(8px);
+    }
+    .chip{padding:6px 10px; border:1px solid #2b3a55; border-radius:10px; font-weight:700; font-size:12px; color:#cbd5e1; cursor:pointer; user-select:none; transition:.15s}
+    .chip:hover{background:#1a2540}
+    .chip.active{background:#233153;border-color:#42567a}
+
+    .sort{display:flex;align-items:center;gap:8px}
+    select{background:#0e152a;border:1px solid #273449;border-radius:12px;color:#e6edf3;padding:8px 12px}
+
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:18px}
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));
+      border:1px solid #1f2a44; border-radius:18px; overflow:hidden;
+      box-shadow:0 10px 30px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.03);
+      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    }
+    .card:hover{transform:translateY(-4px); box-shadow:0 18px 40px rgba(0,0,0,.35); border-color:#2a375b}
+    .poster{position:relative;background:#0a0f1a}
+    .poster img{width:100%;height:360px;object-fit:cover;display:block}
+    .rating{position:absolute; left:10px; top:10px; padding:6px 8px; font-weight:700; font-size:12px;
+      background:rgba(17,24,39,.75); border:1px solid #334155; color:#c7ff75; border-radius:12px; backdrop-filter: blur(4px)}
+    .body{padding:12px 14px}
+    .title{font-weight:700;margin:0 0 6px;color:#f8fafc;font-size:16px;line-height:1.2}
+    .meta{color:#9fb0c6;font-size:12px;margin-bottom:8px}
+    .genres{color:#92a2b8;font-size:12px;height:32px;overflow:hidden}
+    .row{display:flex;justify-content:space-between;align-items:center;margin-top:10px}
+    .link{padding:7px 10px;border:1px solid #2b3a55;border-radius:10px;color:#e6edf3;text-decoration:none;font-size:13px}
+    .link:hover{background:#1c2742}
+
+    .skeleton{border-radius:18px;overflow:hidden;border:1px solid #1f2a44;height:430px;position:relative}
+    .shimmer{position:absolute;inset:0;background:
+      linear-gradient(90deg, rgba(255,255,255,.03) 0%, rgba(255,255,255,.08) 48%, rgba(255,255,255,.03) 100%);
+      transform:translateX(-100%); animation:sh 1.2s infinite; }
+    @keyframes sh { to{ transform:translateX(100%); } }
+
+    .pager{display:flex;gap:10px;justify-content:center;margin:22px 0 0}
+    .muted{color:#8ea0b5;font-size:13px}
+    .center{display:flex;align-items:center;justify-content:center;height:160px}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <div class="logo">Movies — A–Z</div>
+        <div class="sub">Browse the catalog alphabetically. Sort by title, rating, or year.</div>
+      </div>
+      <div class="sort">
+        <label for="sort">Sort</label>
+        <select id="sort" onchange="applySort()">
+          <option value="az">Title A→Z</option>
+          <option value="za">Title Z→A</option>
+          <option value="rating">Rating ↓</option>
+          <option value="year">Year ↓</option>
+        </select>
+      </div>
+    </header>
+
+    <div class="toolbar">
+      <div class="input">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M21 21l-3.6-3.6m1.1-5.4A7 7 0 1 1 4 12a7 7 0 0 1 14 0Z" stroke="#6b7c93" stroke-width="2" stroke-linecap="round"/></svg>
+        <input id="q" type="text" placeholder="Search by title…" />
+      </div>
+      <button class="btn" onclick="doSearch()">Search</button>
+      <button class="btn secondary" onclick="loadPopular(1)">Popular</button>
+      <button class="btn secondary" onclick="loadPage(1)">All (A–Z)</button>
+    </div>
+
+    <div id="alpha" class="alpha"></div>
+
+    <div id="note" class="note"></div>
+    <div id="grid" class="grid"></div>
+
+    <div class="pager">
+      <button class="btn secondary" onclick="prevPage()">Prev</button>
+      <button class="btn" onclick="nextPage()">Next</button>
+    </div>
+  </div>
+
+  <script>
+    let currentPage = 1;
+    let lastQuery = "";      // free-text search
+    let activeLetter = "";   // A–Z filter
+    let currentList = [];    // items kept in memory (render source)
+    let sortMode = "az";
+    let mode = "popular";    // "popular" | "search" | "all"
+
+    const letters = ["All","A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","0-9"];
+
+    function mountAlphabet(){
+      const el = document.getElementById("alpha");
+      el.innerHTML = letters.map(l => `<span class="chip" data-v="${l}" onclick="pickLetter('${l}')">${l}</span>`).join("");
+      setActiveChip("All");
+    }
+    function setActiveChip(v){
+      [...document.querySelectorAll(".chip")].forEach(c => c.classList.toggle("active", c.getAttribute("data-v")===v));
+    }
+
+    function showError(e){
+      console.error("UI error:", e);
+      const m = (e && e.message) ? e.message : (e?.status ? `Error ${e.status}` : 'Error');
+      document.getElementById('note').textContent = m;
+      const grid = document.getElementById('grid');
+      if (grid) grid.innerHTML = '<div class="center muted">'+m+'</div>';
+    }
+
+    async function parseJsonSafe(res){
+      try {
+        // First try normal JSON
+        return await res.json();
+      } catch (_) {
+        // Fallback for stray BOM / commas
+        let txt = await res.text();
+        txt = txt.replace(/^\uFEFF/, '').replace(/^\s*,\s*/, '');
+        return JSON.parse(txt);
+      }
+    }
+
+    function putSkeletons(n=8){
+      const grid = document.getElementById('grid');
+      grid.innerHTML = Array.from({length:n}).map(()=>`<div class="skeleton"><div class="shimmer"></div></div>`).join('');
+    }
+
+    function render(list){
+      let filtered = list;
+
+      // Apply letter filter on client
+      if(activeLetter && activeLetter!=="All"){
+        if(activeLetter==="0-9"){
+          filtered = list.filter(m => /^[0-9]/i.test((m.name||"").trim()));
+        }else{
+          filtered = list.filter(m => (m.name||"").trim().toUpperCase().startsWith(activeLetter));
+        }
+      }
+
+      // Sort
+      filtered.sort((a,b)=>{
+        const an=(a.name||"").toLocaleUpperCase(), bn=(b.name||"").toLocaleUpperCase();
+        const ay=Number(a.year)||0, by=Number(b.year)||0;
+        const ar=Number(a.rating)||0, br=Number(b.rating)||0;
+        if(sortMode==="az") return an.localeCompare(bn);
+        if(sortMode==="za") return bn.localeCompare(an);
+        if(sortMode==="rating") return br - ar;
+        if(sortMode==="year") return by - ay;
+        return 0;
+      });
+
+      currentList = filtered;
+
+      const card = (m)=>{
+        const year = m.year || '';
+        const rating = (m.rating ?? '') || '—';
+        const genres = (m.genres || []).join(', ');
+        const poster = m.poster || '';
+        return `
+          <article class="card">
+            <div class="poster">
+              <img src="${poster}" alt="">
+              <div class="rating">${rating}</div>
+            </div>
+            <div class="body">
+              <h3 class="title">${m.name}</h3>
+              <div class="meta">${year ? year+' • ' : ''}Rating</div>
+              <div class="genres" title="${genres}">${genres}</div>
+              <div class="row">
+                <span class="muted">${(m.countries||[]).join(', ')}</span>
+                <a class="link" href="/movie/${m.id}">Details</a>
+              </div>
+            </div>
+          </article>`;
+      };
+
+      document.getElementById('grid').innerHTML = filtered.map(card).join('');
+      document.getElementById('note').textContent =
+        `Mode: ${mode} · Page ${currentPage} · ${filtered.length} items (sorted ${sortMode.toUpperCase()})`;
+    }
+
+    async function fetchPopular(page){
+      console.debug("fetchPopular", page);
+      const res = await fetch(`/api/movies/popular?page=${page}`);
+      const data = await parseJsonSafe(res);
+      currentPage = data.page || page;
+      return data.movies || [];
+    }
+
+    async function fetchAll(page){
+      // For now we reuse "popular" as the catalog page source.
+      return await fetchPopular(page);
+    }
+
+    async function loadPopular(page=1){
+      try{
+        mode = "popular"; lastQuery = ""; activeLetter = ""; setActiveChip("All");
+        putSkeletons();
+        const list = await fetchPopular(page);
+        render(list);
+      }catch(err){ showError(err); }
+    }
+
+    async function loadPage(page=1){
+      try{
+        mode = "all"; lastQuery = ""; activeLetter = ""; setActiveChip("All");
+        putSkeletons();
+        const list = await fetchAll(page);
+        render(list);
+      }catch(err){ showError(err); }
+    }
+
+    async function searchMovies(q, page=1){
+      try{
+        mode = "search"; activeLetter = ""; setActiveChip("All");
+        putSkeletons();
+        const res = await fetch(`/api/movies/search?q=${encodeURIComponent(q)}&page=${page}`);
+        const data = await parseJsonSafe(res);
+        currentPage = data.page || 1;
+        document.getElementById('note').textContent = `Search: “${data.query || q}” — ${data.count ?? 0} items`;
+        render(data.movies || []);
+      }catch(err){ showError(err); }
+    }
+
+    function doSearch(){
+      const v = document.getElementById('q').value.trim();
+      lastQuery = v;
+      if(!v){ loadPopular(1); return; }
+      searchMovies(v, 1);
+    }
+
+    function pickLetter(l){
+      activeLetter = (l==="All") ? "" : l.toUpperCase();
+      setActiveChip(l);
+      render(currentList);
+      if(!currentList.length){
+        if(mode==="search" && lastQuery){ searchMovies(lastQuery, currentPage); }
+        else if(mode==="popular"){ loadPopular(currentPage); }
+        else{ loadPage(currentPage); }
+      }
+    }
+
+    function applySort(){
+      sortMode = document.getElementById("sort").value;
+      render(currentList);
+    }
+
+    function nextPage(){
+      const next = currentPage + 1;
+      if(mode==="search" && lastQuery){ searchMovies(lastQuery, next); }
+      else if(mode==="popular"){ loadPopular(next); }
+      else{ loadPage(next); }
+    }
+    function prevPage(){
+      const prev = Math.max(1, currentPage - 1);
+      if(mode==="search" && lastQuery){ searchMovies(lastQuery, prev); }
+      else if(mode==="popular"){ loadPopular(prev); }
+      else{ loadPage(prev); }
+    }
+
+    // boot
+    mountAlphabet();
+    // Load POPULAR by default so you immediately see movies
+    loadPopular(1);
+  </script>
+</body>
+</html>

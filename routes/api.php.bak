@@ -1,0 +1,9 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\MovieController;
+
+// order matters вЂ“ specific routes first:
+Route::get('/movies/popular', [MovieController::class, 'popular']);
+Route::get('/movies/search',  [MovieController::class, 'search']);
+Route::get('/movies/{id}',    [MovieController::class, 'show']);

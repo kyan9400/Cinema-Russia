@@ -1,0 +1,121 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Http\JsonResponse;
+
+class MovieController extends Controller
+{
+    /** GET /api/movies/popular */
+    public function popular(Request $request): JsonResponse
+    {
+        $apiKey = env('KINOPOISK_API_KEY');
+        if (!$apiKey) {
+            return response()->json(['error' => 'API key missing'], 500);
+        }
+
+        $page = (int) $request->query('page', 1);
+
+        $response = Http::withHeaders([
+            'X-API-KEY'    => $apiKey,
+            'Content-Type' => 'application/json',
+        ])->get('https://kinopoiskapiunofficial.tech/api/v2.2/films/top', [
+            'type' => 'TOP_100_POPULAR_FILMS',
+            'page' => $page,
+        ]);
+
+        if ($response->failed()) {
+            return response()->json([
+                'error'  => 'Kinopoisk request failed',
+                'status' => $response->status(),
+                'body'   => $response->json(),
+            ], 502);
+        }
+
+        $json  = $response->json();
+        $films = data_get($json, 'films', data_get($json, 'items', []));
+
+        $data = collect($films)->map(function ($f) {
+            return [
+                'id'        => $f['filmId'] ?? $f['kinopoiskId'] ?? null,
+                'name'      => $f['nameRu'] ?? $f['nameEn'] ?? $f['nameOriginal'] ?? '',
+                'year'      => $f['year'] ?? null,
+                'poster'    => $f['posterUrlPreview'] ?? $f['posterUrl'] ?? null,
+                'rating'    => $f['rating'] ?? $f['ratingKinopoisk'] ?? null,
+                'genres'    => isset($f['genres']) ? collect($f['genres'])->pluck('genre')->all() : [],
+                'countries' => isset($f['countries']) ? collect($f['countries'])->pluck('country')->all() : [],
+            ];
+        });
+
+        return response()->json([
+            'page'   => $page,
+            'count'  => $data->count(),
+            'movies' => $data->values(),
+        ]);
+    }
+
+    /** GET /api/movies/{id} */
+    public function show(string $id): JsonResponse
+    {
+        $apiKey = env('KINOPOISK_API_KEY');
+
+        $resp = Http::withHeaders([
+            'X-API-KEY' => $apiKey,
+        ])->get("https://kinopoiskapiunofficial.tech/api/v2.2/films/{$id}");
+
+        if ($resp->failed()) {
+            return response()->json(['error' => 'Kinopoisk request failed'], 502);
+        }
+
+        return response()->json($resp->json());
+    }
+
+    /** GET /api/movies/search?q=Tron&page=1 */
+    public function search(Request $request): JsonResponse
+    {
+        $apiKey = env('KINOPOISK_API_KEY');
+        if (!$apiKey) {
+            return response()->json(['error' => 'API key missing'], 500);
+        }
+
+        $q = trim((string) $request->query('q', ''));
+        if ($q === '') {
+            return response()->json(['error' => 'Query is required (q=...)'], 422);
+        }
+
+        $page = (int) $request->query('page', 1);
+
+        // Older search endpoint (still commonly used)
+        $resp = Http::withHeaders([
+            'X-API-KEY'    => $apiKey,
+            'Content-Type' => 'application/json',
+        ])->get('https://kinopoiskapiunofficial.tech/api/v2.1/films/search-by-keyword', [
+            'keyword' => $q,
+            'page'    => $page,
+        ]);
+
+        if ($resp->failed()) {
+            return response()->json(['error' => 'Kinopoisk request failed'], 502);
+        }
+
+        $json  = $resp->json();
+        $films = $json['films'] ?? [];
+
+        $data = collect($films)->map(fn ($f) => [
+            'id'     => $f['filmId'] ?? null,
+            'name'   => $f['nameRu'] ?? $f['nameEn'] ?? $f['nameOriginal'] ?? '',
+            'year'   => $f['year'] ?? null,
+            'poster' => $f['posterUrlPreview'] ?? $f['posterUrl'] ?? null,
+            'rating' => $f['rating'] ?? null,
+        ]);
+
+        return response()->json([
+            'query'  => $q,
+            'page'   => $page,
+            'count'  => $data->count(),
+            'movies' => $data->values(),
+        ]);
+    }
+}

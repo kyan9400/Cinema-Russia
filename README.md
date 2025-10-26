@@ -1,61 +1,295 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Кино-Россия 🎬
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Современное веб-приложение для просмотра каталога фильмов с функционалом избранного.
 
-## About Laravel
+## ✨ Возможности
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- 🎭 **Каталог фильмов** - просмотр популярных фильмов с пагинацией
+- 🔍 **Поиск** - поиск фильмов по названию
+- ❤️ **Избранное** - добавление фильмов в избранное (гостевой режим)
+- 📱 **Адаптивный дизайн** - работает на всех устройствах
+- 🌙 **Тёмная тема** - современный UI с тёмной темой
+- 🇷🇺 **Русский интерфейс** - полностью на русском языке
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 🚀 Быстрый старт
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Требования
 
-## Learning Laravel
+- PHP 8.1+
+- Composer
+- SQLite (встроенная база данных)
+- Kinopoisk API ключ
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### Установка
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+1. **Клонируйте репозиторий:**
+```bash
+git clone <repository-url>
+cd kino-integrator
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+2. **Установите зависимости:**
+```bash
+composer install
+```
 
-## Laravel Sponsors
+3. **Настройте окружение:**
+```bash
+cp .env.example .env
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+4. **Настройте базу данных:**
+```bash
+# SQLite уже настроена по умолчанию
+# Для MySQL/PostgreSQL измените настройки в .env:
+# DB_CONNECTION=mysql
+# DB_HOST=127.0.0.1
+# DB_PORT=3306
+# DB_DATABASE=kino_integrator
+# DB_USERNAME=root
+# DB_PASSWORD=
+```
 
-### Premium Partners
+5. **Добавьте API ключ в `.env`:**
+```env
+KINOPOISK_API_KEY=your_api_key_here
+```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+6. **Запустите миграции:**
+```bash
+php artisan migrate
+```
 
-## Contributing
+7. **Запустите приложение:**
+```bash
+php artisan serve
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+8. **Откройте в браузере:**
+```
+http://localhost:8000
+```
 
-## Code of Conduct
+### Получение API ключа
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+1. Перейдите на [Kinopoisk Unofficial API](https://kinopoiskapiunofficial.tech/)
+2. Зарегистрируйтесь и получите бесплатный API ключ
+3. Добавьте ключ в файл `.env`:
+```env
+KINOPOISK_API_KEY=ваш_ключ_здесь
+```
 
-## Security Vulnerabilities
+## 📁 Структура проекта
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```
+app/
+├── Http/Controllers/
+│   ├── MovieController.php      # API для фильмов
+│   └── FavoritesController.php  # API для избранного
+resources/views/
+├── movies.blade.php            # Главная страница
+├── favorites.blade.php         # Страница избранного
+└── movie.blade.php            # Страница фильма
+routes/
+├── api.php                     # API маршруты
+└── web.php                     # Web маршруты
+database/
+├── migrations/
+│   └── create_favorites_table.php
+└── database.sqlite            # База данных SQLite
+```
 
-## License
+## 🔌 API Endpoints
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### Фильмы
+- `GET /api/movies/popular` - Популярные фильмы
+- `GET /api/movies/search?q=query` - Поиск фильмов
+- `GET /api/movies/list` - Список всех фильмов
+- `GET /api/movies/{id}` - Детали фильма
+
+### Избранное
+- `GET /api/favorites` - Получить избранное
+- `POST /api/favorites/{movieId}` - Добавить в избранное
+- `DELETE /api/favorites/{movieId}` - Удалить из избранного
+- `GET /api/favorites/check/{movieId}` - Проверить статус
+
+## 🎯 Основные страницы
+
+- `/` - Главная страница (популярные фильмы)
+- `/movies` - Каталог всех фильмов
+- `/favorites` - Избранные фильмы
+- `/movie/{id}` - Страница фильма
+
+## 🛠 Технологии
+
+- **Backend:** Laravel 11, PHP 8.1+
+- **Frontend:** Vanilla JavaScript, CSS3
+- **Storage:** SQLite (избранное)
+- **API:** Kinopoisk API
+- **Design:** Современный UI с тёмной темой
+
+## 📱 Особенности
+
+### Пагинация
+- 10 фильмов на странице
+- Навигация стрелками
+- Показ текущей страницы
+
+### Избранное
+- Гостевой режим (без регистрации)
+- Хранение в SQLite
+- Автоматическое создание guest_id
+- Синхронизация между страницами
+
+### Поиск
+- Поиск по названию
+- Интеграция с пагинацией
+- Обработка ошибок
+
+### Кэширование
+- Кэширование ответов API для оптимизации
+- Автоматическое обновление кэша
+
+## 🔧 Настройка
+
+### База данных
+По умолчанию используется SQLite (файл `database/database.sqlite`).
+Для использования MySQL или PostgreSQL:
+
+1. Измените настройки в `.env`:
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=kino_integrator
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+2. Создайте базу данных:
+```sql
+CREATE DATABASE kino_integrator;
+```
+
+3. Запустите миграции:
+```bash
+php artisan migrate
+```
+
+### API ключ
+Получите API ключ на [Kinopoisk API](https://kinopoiskapiunofficial.tech/) и добавьте в `.env`:
+```env
+KINOPOISK_API_KEY=your_api_key_here
+```
+
+## 🎨 Интерфейс
+
+- **Адаптивный дизайн** — работает на всех устройствах
+- **Тёмная тема** — современный внешний вид
+- **Интуитивная навигация** — простое управление
+- **Быстрая загрузка** — оптимизированная производительность
+- **Визуальная обратная связь** — индикаторы загрузки и ошибок
+
+## 📸 Скриншоты
+
+### Главная страница
+![Главная страница](screenshots/main-page.png)
+*Отображение популярных фильмов с пагинацией*
+
+### Поиск фильмов
+![Поиск](screenshots/search.png)
+*Поиск по названию с результатами*
+
+### Страница фильма
+![Детали фильма](screenshots/movie-details.png)
+*Полная информация о фильме: постер, рейтинг, жанры, описание*
+
+### Избранное
+![Страница избранного](screenshots/favorites.png)
+*Персональная коллекция избранных фильмов*
+
+### Адаптивный дизайн
+![Мобильная версия](screenshots/mobile.png)
+*Оптимизированный интерфейс для мобильных устройств*
+
+## 🔒 Безопасность
+
+- **Защита от SQL инъекций** — использование подготовленных запросов Laravel
+- **Валидация входных данных** — проверка всех пользовательских данных
+- **Безопасное хранение API ключей** — использование .env файлов
+- **Обработка ошибок** — корректная обработка 404, 500 и сетевых ошибок
+
+## ⚡ Производительность
+
+- **Кэширование API ответов** — уменьшение количества запросов к внешнему API
+- **Оптимизация запросов к БД** — эффективные запросы с индексами
+- **Ленивая загрузка изображений** — оптимизация загрузки постеров
+- **Минификация CSS/JS** — уменьшение размера файлов
+
+## 🐳 Docker (рекомендуется)
+
+Для развертывания через Docker:
+
+1. **Клонируйте репозиторий:**
+```bash
+git clone <repository-url>
+cd kino-integrator
+```
+
+2. **Добавьте API ключ в `.env`:**
+```env
+KINOPOISK_API_KEY=your_api_key_here
+```
+
+3. **Запустите через Docker:**
+```bash
+docker-compose up -d
+```
+
+4. **Запустите миграции:**
+```bash
+docker-compose exec app php artisan migrate
+```
+
+5. **Откройте в браузере:**
+```
+http://localhost:8000
+```
+
+### Docker команды
+
+```bash
+# Запуск
+docker-compose up -d
+
+# Остановка
+docker-compose down
+
+# Просмотр логов
+docker-compose logs -f
+
+# Выполнение команд в контейнере
+docker-compose exec app php artisan migrate
+docker-compose exec app php artisan cache:clear
+```
+
+## 🤝 Вклад в проект
+
+1. Fork репозиторий
+2. Создайте feature branch
+3. Commit изменения
+4. Push в branch
+5. Создайте Pull Request
+
+## 📄 Лицензия
+
+MIT License
+
+## 👨‍💻 Автор
+
+Проект кино-интегратора
+
+## 🙏 Благодарности
+
+- [Kinopoisk Unofficial API](https://kinopoiskapiunofficial.tech/) за предоставление данных о фильмах
+- [Laravel](https://laravel.com/) за отличный PHP фреймворк
