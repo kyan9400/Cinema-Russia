@@ -18,6 +18,7 @@
 - PHP 8.1+
 - Composer
 - SQLite (встроенная база данных)
+- Redis (опционально, для кэширования и избранного)
 - Kinopoisk API ключ
 
 ### Установка
@@ -53,19 +54,37 @@ cp .env.example .env
 5. **Добавьте API ключ в `.env`:**
 ```env
 KINOPOISK_API_KEY=your_api_key_here
+
+# Для тестирования без API ключа используйте:
+KINOPOISK_API_KEY=demo_key_for_testing
 ```
 
-6. **Запустите миграции:**
+6. **Настройте Redis (опционально):**
+```bash
+# Для использования Redis установите Redis сервер:
+# Windows: скачайте с https://github.com/microsoftarchive/redis/releases
+# Linux: sudo apt-get install redis-server
+# macOS: brew install redis
+
+# В .env файле настройте Redis:
+REDIS_HOST=127.0.0.1
+REDIS_PORT=6379
+REDIS_PASSWORD=null
+
+# Если Redis недоступен, приложение автоматически использует SQLite для избранного
+```
+
+7. **Запустите миграции:**
 ```bash
 php artisan migrate
 ```
 
-7. **Запустите приложение:**
+8. **Запустите приложение:**
 ```bash
 php artisan serve
 ```
 
-8. **Откройте в браузере:**
+9. **Откройте в браузере:**
 ```
 http://localhost:8000
 ```
@@ -124,7 +143,7 @@ database/
 
 - **Backend:** Laravel 11, PHP 8.1+
 - **Frontend:** Vanilla JavaScript, CSS3
-- **Storage:** SQLite (избранное)
+- **Storage:** SQLite (избранное), Redis (опционально)
 - **API:** Kinopoisk API
 - **Design:** Современный UI с тёмной темой
 

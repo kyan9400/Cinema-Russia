@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\DB;
 
 class FavoritesController extends Controller
@@ -30,14 +29,10 @@ class FavoritesController extends Controller
     {
         $guestId = $this->getGuestId($request);
         
-        try {
-            $favoriteIds = Redis::smembers("favorites:{$guestId}");
-        } catch (\Exception $e) {
-            $favoriteIds = DB::table('favorites')
-                ->where('guest_id', $guestId)
-                ->pluck('movie_id')
-                ->toArray();
-        }
+        $favoriteIds = DB::table('favorites')
+            ->where('guest_id', $guestId)
+            ->pluck('movie_id')
+            ->toArray();
         
         if (empty($favoriteIds)) {
             return response()->json([
@@ -64,7 +59,10 @@ class FavoritesController extends Controller
     {
         $guestId = $this->getGuestId($request);
         
-        $isFavorite = Redis::sismember("favorites:{$guestId}", $movieId);
+        $isFavorite = DB::table('favorites')
+            ->where('guest_id', $guestId)
+            ->where('movie_id', $movieId)
+            ->exists();
         
         if ($isFavorite) {
             return response()->json(['message' => 'Movie already in favorites']);
@@ -76,23 +74,29 @@ class FavoritesController extends Controller
             return response()->json(['error' => 'Movie not found'], 404);
         }
 
-        Redis::sadd("favorites:{$guestId}", $movieId);
+        DB::table('favorites')->insert([
+            'guest_id' => $guestId,
+            'movie_id' => $movieId,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
         
         $response = response()->json([
             'message' => 'Movie added to favorites',
             'movie' => $movieData
         ]);
         
-        $response->cookie('guest_id', $guestId, 60 * 24 * 30);
-        
-        return $response;
+        return $response->cookie('guest_id', $guestId, 60 * 24 * 30);
     }
 
     public function destroy(Request $request, string $movieId): JsonResponse
     {
         $guestId = $this->getGuestId($request);
         
-        $removed = Redis::srem("favorites:{$guestId}", $movieId);
+        $removed = DB::table('favorites')
+            ->where('guest_id', $guestId)
+            ->where('movie_id', $movieId)
+            ->delete();
         
         return response()->json([
             'message' => 'Movie removed from favorites',
@@ -103,7 +107,11 @@ class FavoritesController extends Controller
     public function check(Request $request, string $movieId): JsonResponse
     {
         $guestId = $this->getGuestId($request);
-        $isFavorite = Redis::sismember("favorites:{$guestId}", $movieId);
+        
+        $isFavorite = DB::table('favorites')
+            ->where('guest_id', $guestId)
+            ->where('movie_id', $movieId)
+            ->exists();
         
         return response()->json([
             'is_favorite' => $isFavorite
