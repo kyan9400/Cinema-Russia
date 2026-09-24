@@ -15,18 +15,18 @@
 
 ### Требования
 
-- PHP 8.1+
+- PHP 8.2+
 - Composer
 - SQLite (встроенная база данных)
-- Redis (опционально, для кэширования и избранного)
+- Redis (опционально, для кэширования)
 - Kinopoisk API ключ
 
 ### Установка
 
 1. **Клонируйте репозиторий:**
 ```bash
-git clone <repository-url>
-cd kino-integrator
+git clone https://github.com/kyan9400/Cinema-Russia.git
+cd Cinema-Russia
 ```
 
 2. **Установите зависимости:**
@@ -67,11 +67,14 @@ KINOPOISK_API_KEY=demo_key_for_testing
 # macOS: brew install redis
 
 # В .env файле настройте Redis:
+CACHE_STORE=redis
+REDIS_CLIENT=predis
 REDIS_HOST=127.0.0.1
 REDIS_PORT=6379
 REDIS_PASSWORD=null
 
-# Если Redis недоступен, приложение автоматически использует SQLite для избранного
+# Если Redis не настроен, кэш хранится в базе данных (CACHE_STORE=database).
+# Избранное всегда хранится в базе данных (SQLite по умолчанию)
 ```
 
 7. **Запустите миграции:**
@@ -141,9 +144,9 @@ database/
 
 ## 🛠 Технологии
 
-- **Backend:** Laravel 11, PHP 8.1+
+- **Backend:** Laravel 12, PHP 8.2+
 - **Frontend:** Vanilla JavaScript, CSS3
-- **Storage:** SQLite (избранное), Redis (опционально)
+- **Storage:** SQLite (избранное, кэш), Redis (опционально, кэш)
 - **API:** Kinopoisk API
 - **Design:** Современный UI с тёмной темой
 
@@ -251,11 +254,14 @@ KINOPOISK_API_KEY=your_api_key_here
 
 1. **Клонируйте репозиторий:**
 ```bash
-git clone <repository-url>
-cd kino-integrator
+git clone https://github.com/kyan9400/Cinema-Russia.git
+cd Cinema-Russia
 ```
 
-2. **Добавьте API ключ в `.env`:**
+2. **Создайте `.env` и добавьте API ключ:**
+```bash
+cp .env.example .env
+```
 ```env
 KINOPOISK_API_KEY=your_api_key_here
 ```
@@ -265,8 +271,11 @@ KINOPOISK_API_KEY=your_api_key_here
 docker-compose up -d
 ```
 
-4. **Запустите миграции:**
+4. **Установите зависимости, сгенерируйте ключ и запустите миграции:**
 ```bash
+# каталог проекта монтируется в контейнер, поэтому vendor/ ставится внутри него
+docker-compose exec app composer install
+docker-compose exec app php artisan key:generate
 docker-compose exec app php artisan migrate
 ```
 
@@ -302,7 +311,7 @@ docker-compose exec app php artisan cache:clear
 
 ## 📄 Лицензия
 
-MIT License
+MIT License — см. файл [LICENSE](LICENSE).
 
 ## 👨‍💻 Автор
 
