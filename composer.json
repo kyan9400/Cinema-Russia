@@ -1,9 +1,9 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/laravel",
+    "name": "kyan9400/cinema-russia",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
-    "keywords": ["laravel", "framework"],
+    "description": "Кино-Россия: веб-приложение каталога фильмов на Laravel с поиском и избранным (Kinopoisk API).",
+    "keywords": ["laravel", "php", "kinopoisk", "movies"],
     "license": "MIT",
     "require": {
         "php": "^8.2",
