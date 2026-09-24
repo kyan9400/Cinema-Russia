@@ -2,12 +2,9 @@ name: Tests
 
 on:
   push:
-    branches:
-      - master
-      - '*.x'
+    branches: [main]
   pull_request:
-  schedule:
-    - cron: '0 0 * * *'
+    branches: [main]
 
 permissions:
   contents: read
@@ -33,6 +30,9 @@ jobs:
           php-version: ${{ matrix.php }}
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite
           coverage: none
+
+      - name: Validate composer.json
+        run: composer validate --strict --no-check-publish
 
       - name: Install Composer dependencies
         run: composer install --prefer-dist --no-interaction --no-progress
